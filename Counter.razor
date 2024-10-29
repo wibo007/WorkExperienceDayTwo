@@ -1,0 +1,127 @@
+﻿@page "/counter"
+
+<PageTitle>Counter</PageTitle>
+
+<h1><strong>Paint Calculator</strong></h1>
+
+<h6> Enter your room's dimensions</h6> 
+
+<p> </p>
+Enter the height of your room:
+@* bind-value means that user input is bound to the inputHeight variable *@
+<input type="text" @bind-value="inputHeight">
+
+<p> </p>
+Enter the width of your room:
+<input type="text" @bind-value="inputWidth">
+
+<p> </p>
+Enter the length of your room:
+<input type="text" @bind-value="inputLength">
+
+<p> </p>
+Enter the no of windows:
+<input type="text" @bind-value="inputWindows">
+
+<p role="status"> Number of cans needed: @noCans</p>
+
+<p role="status"> Price: £@price</p>
+@* when the button is pressed, it calls the PaintCalculator method *@
+<p <button class="btn btn-primary" @onclick="PaintCalculator">Calculate</button> </p>
+
+
+@code 
+{
+    //intialising variables 
+    private double inputHeight;
+    private double inputWidth;
+    private double inputLength;
+    private double inputWindows;
+    private double noCans;
+    private double price;
+    //declaring and initialising constants
+    //constant for the window's length
+    private const double winLengh = 0.635;
+    //constant for the window's width
+    private const double winWidth = 0.89;
+    //constant for the door's length
+    private const double drLength = 0.762;
+    //constant for the door's width
+    private const double drWidth = 1.981;
+
+    private void PaintCalculator()
+    {
+        //creates the object r from class room
+        Room r = new Room();
+        //gets variable surfaceAreaFinal from the SurfaceAreaCalculator method in the Room class
+        double ans = r.SurfaceAreaCalculator(inputWidth, inputHeight, inputLength, inputWindows);
+        //creates the object paintCalc from the Paint class
+        Paint p = new Paint();
+        //creates variables noCans and price for class methods paintCanNoCalculator and TotalPrice
+        //5 = assuming 5l can of paint
+        //28 = assuming price is £28
+        noCans = p.paintCanNoCalculator(ans, 5);
+        price = p.TotalPrice(28, noCans);
+        
+    }
+
+    class Paint
+    {
+        private double paintCapacity;
+        private double pricePerCan;
+        private double noOfCans;
+        private double price;
+        private double totalVolumeNeeded;
+
+        public double paintCanNoCalculator(double ans, double paintCapacity)
+        {
+            //converts the m to cm and persumes you will need two coats of paint. then divides to get from ml to l 
+            totalVolumeNeeded = (((ans * 100) * 2) / 1000);
+            if (totalVolumeNeeded < paintCapacity)
+            {
+                noOfCans = 1;
+            }
+            else
+            {
+                //rounds up to the whole no of cans needed
+                noOfCans = Convert.ToInt32(Math.Ceiling(totalVolumeNeeded / paintCapacity));
+            }
+            return noOfCans;
+        }
+        public double TotalPrice(double pricePerCan, double noOfCans)
+        {
+            price = pricePerCan * noOfCans;
+            return price;
+
+        }
+
+    }
+
+    class Walls
+    {
+        private double length;
+        private double width;
+        private double area;
+
+        public double Area(double length, double width)
+        {
+            area = length = width;
+            return area;
+        }
+    }
+
+    class Room : Walls
+    {
+        private double height;
+        public double surfaceArea;
+        public double windowNo;
+        public double SurfaceAreaCalculator(double width, double height, double length, double windowNo)
+        {
+            surfaceArea = ((length * height) * 2) + ((width * height) * 2) + ((width * length) * 2);
+            surfaceArea = surfaceArea - (windowNo * (winLengh * winWidth)) - (drLength * drWidth);
+            return surfaceArea;
+        }
+    }
+
+ 
+}
